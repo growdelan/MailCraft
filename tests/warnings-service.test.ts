@@ -31,6 +31,23 @@ describe('warnings-service', () => {
     expect(warnings.some((item) => item.includes('iframe'))).toBe(true);
     expect(warnings.some((item) => item.includes('JS inline'))).toBe(true);
   });
+
+  it('does not return missing title warning when title exists in full html document', () => {
+    const html =
+      '<!doctype html><html><head><meta charset="UTF-8"><title>Przypomnienie</title></head><body><p>Treść</p></body></html>';
+
+    const warnings = getWarnings(html, 'gmail');
+
+    expect(warnings.some((item) => item.includes('<title>'))).toBe(false);
+  });
+
+  it('returns missing title warning for full html document without title', () => {
+    const html = '<!doctype html><html><head><meta charset="UTF-8"></head><body><p>Treść</p></body></html>';
+
+    const warnings = getWarnings(html, 'gmail');
+
+    expect(warnings.some((item) => item.includes('<title>'))).toBe(true);
+  });
 });
 
 describe('preview-service', () => {

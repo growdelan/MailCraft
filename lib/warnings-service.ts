@@ -2,11 +2,29 @@ function containsAny(text: string, patterns: string[]): boolean {
   return patterns.some((pattern) => text.includes(pattern));
 }
 
+function hasTitleTag(html: string): boolean {
+  if (typeof DOMParser !== 'undefined') {
+    const parser = new DOMParser();
+    const documentNode = parser.parseFromString(html, 'text/html');
+
+    if (documentNode.querySelector('head title')) {
+      return true;
+    }
+
+    const htmlTagExists = /<html\b/i.test(html) || /<!doctype/i.test(html);
+    if (htmlTagExists) {
+      return false;
+    }
+  }
+
+  return /<title\b[^>]*>/i.test(html);
+}
+
 export function getWarnings(html: string, clientModeId: string): string[] {
   const normalizedHtml = html.toLowerCase();
   const warnings: string[] = [];
 
-  if (!normalizedHtml.includes('<title')) {
+  if (!hasTitleTag(html)) {
     warnings.push('Brak znacznika <title>.');
   }
 

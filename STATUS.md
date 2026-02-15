@@ -16,12 +16,18 @@
 - Modal „Wyślij test” z walidacją e-mail i obsługą success/error.
 - Mock endpoint `POST /api/email/test` z opóźnieniem, rate limit i losowym błędem serwera.
 - Testy kontraktu API oraz klienta wysyłki testowej.
+- Dla pełnego HTML e-mail podgląd zachowuje kluczowy layout i inline style (nagłówek, treść, CTA, stopka).
+- Dla pełnych szablonów HTML źródłowy dokument (`head/title/body`) pozostaje spójny, a podgląd i warnings bazują na aktualnym draftcie.
+- WYSIWYG pozostaje edytowalny dla pełnego HTML; zmiany treści są synchronizowane live do preview bez niszczenia struktury maila.
+- Warning `<title>` nie pojawia się, jeśli `<title>` istnieje w źródłowym dokumencie HTML.
 
 ## Co jest skończone
 - Milestone 0.5: Minimal end-to-end slice.
 - Milestone 1.0: Editor Core + Tokens.
 - Milestone 1.5: Preview + Warnings + Responsywność.
 - Milestone 2.0: Send Test + Export + Domknięcie MVP.
+- Milestone 2.5: HTML Rendering Parity — Stabilizacja podglądu.
+- Milestone 3.0: Dokument HTML i warning parity.
 - Minimalna konfiguracja projektu Next.js + TypeScript + Vitest.
 - Dokumentacja uruchomienia i testów w `README.md`.
 
@@ -29,7 +35,7 @@
 - Brak aktywnego milestone’u w statusie `in_progress`.
 
 ## Co jest następne
-- Brak kolejnego milestone’u w roadmapie (MVP domknięte).
+- Brak kolejnego milestone’u w roadmapie.
 
 ## Blokery i ryzyka
 - Brak blockerów krytycznych na ten moment.
@@ -40,3 +46,5 @@
 - 2026-02-15: Zakończono Milestone 1.0 i oznaczono go jako `done` w `ROADMAP.md`.
 - 2026-02-15: Zakończono Milestone 1.5 i oznaczono go jako `done` w `ROADMAP.md`.
 - 2026-02-15: Zakończono Milestone 2.0 i oznaczono go jako `done` w `ROADMAP.md`.
+- 2026-02-15: Zakończono Milestone 2.5 i oznaczono go jako `done` w `ROADMAP.md`.
+- 2026-02-15: Zakończono Milestone 3.0 i oznaczono go jako `done` w `ROADMAP.md`.

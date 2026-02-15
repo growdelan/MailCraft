@@ -11,6 +11,11 @@ import { DEVICE_PRESETS, ZOOM_PRESETS, ZoomPreset } from '../../lib/devices';
 import { Draft, DraftMode, loadDraft, saveDraft } from '../../lib/draft-service';
 import { SendTestError, SendTestResponse, sendTestEmail } from '../../lib/email-api';
 import { EmailToken } from '../../lib/email-token-extension';
+import {
+  getWysiwygContentFromSource,
+  isStructuredEmailHtml,
+  mergeWysiwygContentIntoSource
+} from '../../lib/html-sync-policy';
 import { sanitizePreviewHtml } from '../../lib/preview-service';
 import { TAG_CATEGORIES, TAGS } from '../../lib/tag-service';
 import {
@@ -25,6 +30,8 @@ type MobileTab = 'editor' | 'preview' | 'tags';
 export default function EditorPage() {
   const router = useRouter();
   const htmlTextAreaRef = useRef<HTMLTextAreaElement>(null);
+  const modeRef = useRef<DraftMode>('wysiwyg');
+  const isStructuredHtmlRef = useRef(false);
 
   const [isReady, setIsReady] = useState(false);
   const [mode, setMode] = useState<DraftMode>('wysiwyg');
@@ -43,14 +50,25 @@ export default function EditorPage() {
   const [testError, setTestError] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<SendTestResponse | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const isStructuredHtml = useMemo(() => isStructuredEmailHtml(html), [html]);
 
   const editor = useEditor({
     extensions: [StarterKit, EmailToken],
     content: '',
     immediatelyRender: false,
     onUpdate: ({ editor: nextEditor }) => {
-      const rawHtml = nextEditor.getHTML();
-      setHtml(stripTokenSpansFromWysiwyg(rawHtml));
+      if (modeRef.current !== 'wysiwyg') {
+        return;
+      }
+
+      const nextBodyHtml = stripTokenSpansFromWysiwyg(nextEditor.getHTML());
+
+      if (isStructuredHtmlRef.current) {
+        setHtml((previousHtml) => mergeWysiwygContentIntoSource(previousHtml, nextBodyHtml));
+        return;
+      }
+
+      setHtml(nextBodyHtml);
     }
   });
 
@@ -62,6 +80,8 @@ export default function EditorPage() {
       return;
     }
 
+    modeRef.current = storedDraft.mode;
+    isStructuredHtmlRef.current = isStructuredEmailHtml(storedDraft.html);
     setHtml(storedDraft.html);
     setMode(storedDraft.mode);
     setLastSavedDraft(storedDraft);
@@ -73,8 +93,18 @@ export default function EditorPage() {
       return;
     }
 
-    editor.commands.setContent(decorateTokensForWysiwyg(html), false);
+    modeRef.current = mode;
+    isStructuredHtmlRef.current = isStructuredEmailHtml(html);
+    editor.commands.setContent(decorateTokensForWysiwyg(getWysiwygContentFromSource(html)), false);
   }, [editor, isReady]);
+
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
+
+  useEffect(() => {
+    isStructuredHtmlRef.current = isStructuredHtml;
+  }, [isStructuredHtml]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -288,7 +318,15 @@ export default function EditorPage() {
 
   const switchToHtmlMode = () => {
     if (editor) {
-      setHtml(stripTokenSpansFromWysiwyg(editor.getHTML()));
+      const nextBodyHtml = stripTokenSpansFromWysiwyg(editor.getHTML());
+
+      setHtml((previousHtml) => {
+        if (isStructuredEmailHtml(previousHtml)) {
+          return mergeWysiwygContentIntoSource(previousHtml, nextBodyHtml);
+        }
+
+        return nextBodyHtml;
+      });
     }
 
     setMode('html');
@@ -296,7 +334,7 @@ export default function EditorPage() {
 
   const switchToWysiwygMode = () => {
     if (editor) {
-      editor.commands.setContent(decorateTokensForWysiwyg(html), false);
+      editor.commands.setContent(decorateTokensForWysiwyg(getWysiwygContentFromSource(html)), false);
     }
 
     setMode('wysiwyg');
@@ -466,6 +504,11 @@ export default function EditorPage() {
 
           {mode === 'wysiwyg' ? (
             <div className="wysiwyg-container" data-testid="wysiwyg-editor">
+              {isStructuredHtml ? (
+                <p className="preview-banner" data-testid="wysiwyg-lock-notice">
+                  Edytujesz treść w WYSIWYG. Elementy dokumentu (`head`, `title`) edytuj w trybie HTML source.
+                </p>
+              ) : null}
               <EditorContent editor={editor} />
             </div>
           ) : (
