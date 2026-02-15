@@ -6,14 +6,20 @@ import { useRouter } from 'next/navigation';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
+import { CLIENT_MODES } from '../../lib/client-modes';
+import { DEVICE_PRESETS, ZOOM_PRESETS, ZoomPreset } from '../../lib/devices';
 import { Draft, DraftMode, loadDraft, saveDraft } from '../../lib/draft-service';
 import { EmailToken } from '../../lib/email-token-extension';
+import { sanitizePreviewHtml } from '../../lib/preview-service';
 import { TAG_CATEGORIES, TAGS } from '../../lib/tag-service';
 import {
   decorateTokensForWysiwyg,
   insertTokenAtSelection,
   stripTokenSpansFromWysiwyg
 } from '../../lib/token-helpers';
+import { getWarnings } from '../../lib/warnings-service';
+
+type MobileTab = 'editor' | 'preview' | 'tags';
 
 export default function EditorPage() {
   const router = useRouter();
@@ -24,6 +30,12 @@ export default function EditorPage() {
   const [html, setHtml] = useState('');
   const [search, setSearch] = useState('');
   const [lastSavedDraft, setLastSavedDraft] = useState<Draft | null>(null);
+  const [clientModeId, setClientModeId] = useState('gmail');
+  const [devicePresetId, setDevicePresetId] = useState('email600');
+  const [zoom, setZoom] = useState<ZoomPreset>(100);
+  const [mobileTab, setMobileTab] = useState<MobileTab>('editor');
+  const [previewHtml, setPreviewHtml] = useState('');
+  const [hasBlockedScripts, setHasBlockedScripts] = useState(false);
 
   const editor = useEditor({
     extensions: [StarterKit, EmailToken],
@@ -57,6 +69,18 @@ export default function EditorPage() {
     editor.commands.setContent(decorateTokensForWysiwyg(html), false);
   }, [editor, isReady]);
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      const sanitized = sanitizePreviewHtml(html);
+      setPreviewHtml(sanitized.html);
+      setHasBlockedScripts(sanitized.hasBlockedScripts);
+    }, 180);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [html]);
+
   const isDirty = useMemo(() => {
     if (!lastSavedDraft) {
       return false;
@@ -85,6 +109,18 @@ export default function EditorPage() {
       window.clearTimeout(timeoutId);
     };
   }, [html, isDirty, isReady, mode]);
+
+  const warnings = useMemo(() => {
+    return getWarnings(html, clientModeId);
+  }, [clientModeId, html]);
+
+  const selectedClientMode = useMemo(() => {
+    return CLIENT_MODES.find((item) => item.id === clientModeId) ?? CLIENT_MODES[0];
+  }, [clientModeId]);
+
+  const selectedDevice = useMemo(() => {
+    return DEVICE_PRESETS.find((item) => item.id === devicePresetId) ?? DEVICE_PRESETS[0];
+  }, [devicePresetId]);
 
   const filteredTags = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -203,6 +239,46 @@ export default function EditorPage() {
           <h1>Editor</h1>
           <p data-testid="save-indicator">{isDirty ? 'Niezapisany szkic' : 'Zapisano'}</p>
         </div>
+
+        <div className="toolbar-selects">
+          <label>
+            Client mode
+            <select value={clientModeId} onChange={(event) => setClientModeId(event.target.value)}>
+              {CLIENT_MODES.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Device
+            <select value={devicePresetId} onChange={(event) => setDevicePresetId(event.target.value)}>
+              {DEVICE_PRESETS.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            Zoom
+            <select
+              value={zoom}
+              onChange={(event) => setZoom(Number(event.target.value) as ZoomPreset)}
+              data-testid="zoom-select"
+            >
+              {ZOOM_PRESETS.map((value) => (
+                <option key={value} value={value}>
+                  {value}%
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
         <div className="toolbar-actions">
           <button type="button" onClick={saveNow} data-testid="manual-save-button">
             Zapisz szkic
@@ -229,8 +305,28 @@ export default function EditorPage() {
         </button>
       </section>
 
+      <section className="mobile-tabs">
+        <button
+          type="button"
+          className={mobileTab === 'editor' ? 'active' : ''}
+          onClick={() => setMobileTab('editor')}
+        >
+          Edytor
+        </button>
+        <button
+          type="button"
+          className={mobileTab === 'preview' ? 'active' : ''}
+          onClick={() => setMobileTab('preview')}
+        >
+          Podgląd
+        </button>
+        <button type="button" className={mobileTab === 'tags' ? 'active' : ''} onClick={() => setMobileTab('tags')}>
+          Tagi
+        </button>
+      </section>
+
       <div className="editor-layout">
-        <aside className="tags-panel">
+        <aside className={`tags-panel panel ${mobileTab === 'tags' ? 'mobile-active' : ''}`}>
           <h2>Tagi</h2>
           <input
             type="search"
@@ -249,7 +345,7 @@ export default function EditorPage() {
                 <summary>{category}</summary>
                 <ul>
                   {items.map((tag) => (
-                    <li key={tag.key}>
+                    <li key={tag.key} className="ee-tag-item">
                       <span>{tag.token}</span>
                       <button
                         type="button"
@@ -270,7 +366,24 @@ export default function EditorPage() {
           })}
         </aside>
 
-        <section className="editor-panel" onDragOver={(event) => event.preventDefault()} onDrop={onDropToken}>
+        <section
+          className={`editor-panel panel ee-drop-target ${mobileTab === 'editor' ? 'mobile-active' : ''}`}
+          onDragOver={(event) => event.preventDefault()}
+          onDrop={onDropToken}
+        >
+          <details className="warnings-strip" open>
+            <summary>Ostrzeżenia ({warnings.length})</summary>
+            {warnings.length === 0 ? (
+              <p>Brak ostrzeżeń dla trybu: {selectedClientMode.label}.</p>
+            ) : (
+              <ul>
+                {warnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+            )}
+          </details>
+
           {mode === 'wysiwyg' ? (
             <div className="wysiwyg-container" data-testid="wysiwyg-editor">
               <EditorContent editor={editor} />
@@ -283,6 +396,30 @@ export default function EditorPage() {
               onChange={(event) => setHtml(event.target.value)}
             />
           )}
+        </section>
+
+        <section className={`preview-panel panel ${mobileTab === 'preview' ? 'mobile-active' : ''}`}>
+          <h2>Podgląd</h2>
+          <div className={`ee-preview-shell client-${clientModeId}`}>
+            {hasBlockedScripts ? <p className="preview-banner">Skrypty są blokowane w podglądzie</p> : null}
+
+            <div className="ee-email-canvas">
+              <div className="preview-scale" style={{ transform: `scale(${zoom / 100})` }}>
+                <div
+                  className={`ee-email-container ${selectedDevice.mode}`}
+                  style={{ width: selectedDevice.width, height: selectedDevice.height ?? 900 }}
+                >
+                  <iframe
+                    title="email-preview"
+                    srcDoc={previewHtml}
+                    sandbox=""
+                    data-testid="preview-iframe"
+                    style={{ width: '100%', height: '100%', border: 0, background: '#fff' }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
       </div>
     </main>

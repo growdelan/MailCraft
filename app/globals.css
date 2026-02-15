@@ -10,7 +10,7 @@ body {
 }
 
 main {
-  max-width: 1100px;
+  max-width: 1320px;
   margin: 0 auto;
   background: #fff;
   border: 1px solid #ddd;
@@ -39,8 +39,14 @@ button {
 .toolbar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   gap: 12px;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .toolbar h1 {
@@ -52,31 +58,60 @@ button {
   color: #555;
 }
 
+.toolbar-selects {
+  display: flex;
+  gap: 8px;
+  align-items: end;
+}
+
+.toolbar-selects label {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  color: #555;
+}
+
+.toolbar-selects select {
+  min-width: 140px;
+}
+
 .mode-switch {
   display: flex;
   gap: 8px;
 }
 
-.mode-switch button.active {
+.mode-switch button.active,
+.mobile-tabs button.active {
   background: #0f172a;
   color: #fff;
 }
 
+.mobile-tabs {
+  display: none;
+  gap: 8px;
+}
+
 .editor-layout {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 300px minmax(420px, 1fr) minmax(360px, 1fr);
   gap: 12px;
 }
 
-.tags-panel {
+.panel {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 12px;
-  max-height: 620px;
+  min-height: 620px;
+  background: #fff;
+}
+
+.tags-panel {
+  max-height: 780px;
   overflow: auto;
 }
 
-.tags-panel h2 {
+.tags-panel h2,
+.preview-panel h2 {
   margin: 0 0 8px;
 }
 
@@ -86,24 +121,35 @@ button {
   margin-bottom: 8px;
 }
 
-.tags-panel ul {
+.tags-panel ul,
+.warnings-strip ul {
   list-style: none;
   padding: 0;
   margin: 8px 0;
 }
 
-.tags-panel li {
+.tags-panel li,
+.warnings-strip li {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   margin-bottom: 8px;
   padding: 8px;
 }
 
-.editor-panel {
-  border: 1px solid #ddd;
+.ee-tag-item {
+  cursor: grab;
+}
+
+.ee-drop-target {
+  border-style: dashed;
+}
+
+.warnings-strip {
+  margin-bottom: 10px;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
-  padding: 12px;
-  min-height: 620px;
+  padding: 8px;
+  background: #f8fafc;
 }
 
 .wysiwyg-container .tiptap {
@@ -125,4 +171,98 @@ button {
   background: #dbeafe;
   color: #1e3a8a;
   font-family: 'Courier New', monospace;
+}
+
+.ee-preview-shell {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.ee-preview-shell.client-gmail {
+  border-color: #60a5fa;
+}
+
+.ee-preview-shell.client-outlook {
+  border-color: #3b82f6;
+}
+
+.ee-preview-shell.client-apple {
+  border-color: #94a3b8;
+}
+
+.ee-preview-shell.client-yahoo {
+  border-color: #0891b2;
+}
+
+.ee-preview-shell.client-strict {
+  border-color: #dc2626;
+}
+
+.preview-banner {
+  margin: 0 0 8px;
+  padding: 8px;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+  border-radius: 8px;
+}
+
+.ee-email-canvas {
+  overflow: auto;
+  min-height: 640px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12px;
+}
+
+.preview-scale {
+  transform-origin: top center;
+}
+
+.ee-email-container {
+  background: #fff;
+  border: 1px solid #d1d5db;
+}
+
+@media (max-width: 900px) {
+  body {
+    padding: 12px;
+  }
+
+  .toolbar {
+    position: static;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-selects {
+    flex-wrap: wrap;
+  }
+
+  .editor-layout {
+    display: block;
+  }
+
+  .mobile-tabs {
+    display: flex;
+  }
+
+  .panel {
+    display: none;
+    min-height: auto;
+  }
+
+  .panel.mobile-active {
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  .ee-email-canvas {
+    min-height: 440px;
+  }
 }
