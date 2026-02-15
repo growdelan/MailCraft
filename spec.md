@@ -200,6 +200,21 @@ Każda decyzja powinna zawierać:
 - Uzasadnienie: Najprostszy wariant eliminujący degradację layoutu i inline styles podczas synchronizacji przez edytor WYSIWYG.
 - Konsekwencje: Preview, warnings i eksport pozostają spójne z kodem wejściowym; edycja takich szablonów powinna być wykonywana głównie w `HTML source`.
 
+19.
+- Decyzja: [Nowa funkcjonalność PRD 001, Milestone 3.0] Warnings dla metadanych dokumentu (w tym `<title>`) są wyliczane na podstawie struktury pełnego HTML draftu; dla pełnego dokumentu brak `<title>` jest sygnalizowany tylko wtedy, gdy rzeczywiście nie istnieje w `<head>`.
+- Uzasadnienie: ROADMAP 3.0 wymaga warning parity i eliminacji fałszywych alertów względem źródłowego HTML.
+- Konsekwencje: Rozstrzyga konflikt opisany wcześniej między ograniczeniami WYSIWYG a interpretacją pełnego dokumentu HTML po stronie ostrzeżeń.
+
+20.
+- Decyzja: [Nowa funkcjonalność PRD 001, korekta po 2.5] WYSIWYG pozostaje edytowalny także dla pełnego HTML dokumentu; zmiany z WYSIWYG są synchronizowane do sekcji `<body>` dokumentu źródłowego bez nadpisywania `<head>` i metadanych.
+- Uzasadnienie: Usunięcie regresji użyteczności (brak możliwości edycji WYSIWYG) przy zachowaniu parytetu renderowania i warning parity.
+- Konsekwencje: Użytkownik może dalej pracować wizualnie nad treścią, a elementy dokumentowe (np. `<title>`) pozostają kontrolowane w `HTML source`.
+
+21.
+- Decyzja: [Nowa funkcjonalność PRD 001, domknięcie 3.0] Synchronizacja WYSIWYG -> pełny HTML działa przez bezpieczne mapowanie treści tekstowych (preferencyjnie po elementach liściowych), z fallbackiem „brak nadpisania” przy niejednoznacznym mapowaniu.
+- Uzasadnienie: Potrzebne było jednoczesne utrzymanie live preview i ochrona mailowej struktury/layoutu przed degradacją.
+- Konsekwencje: Użytkownik widzi na żywo większość zmian treści z WYSIWYG, a w przypadkach ryzykownych struktura HTML pozostaje nienaruszona.
+
 ---
 
 ## Jakość i kryteria akceptacji

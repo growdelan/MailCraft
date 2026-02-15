@@ -11,7 +11,11 @@ import { DEVICE_PRESETS, ZOOM_PRESETS, ZoomPreset } from '../../lib/devices';
 import { Draft, DraftMode, loadDraft, saveDraft } from '../../lib/draft-service';
 import { SendTestError, SendTestResponse, sendTestEmail } from '../../lib/email-api';
 import { EmailToken } from '../../lib/email-token-extension';
-import { getWysiwygContentFromSource, isStructuredEmailHtml } from '../../lib/html-sync-policy';
+import {
+  getWysiwygContentFromSource,
+  isStructuredEmailHtml,
+  mergeWysiwygContentIntoSource
+} from '../../lib/html-sync-policy';
 import { sanitizePreviewHtml } from '../../lib/preview-service';
 import { TAG_CATEGORIES, TAGS } from '../../lib/tag-service';
 import {
@@ -47,19 +51,24 @@ export default function EditorPage() {
   const [testResult, setTestResult] = useState<SendTestResponse | null>(null);
   const [isSending, setIsSending] = useState(false);
   const isStructuredHtml = useMemo(() => isStructuredEmailHtml(html), [html]);
-  const isWysiwygSourceLocked = mode === 'wysiwyg' && isStructuredHtml;
 
   const editor = useEditor({
     extensions: [StarterKit, EmailToken],
     content: '',
     immediatelyRender: false,
     onUpdate: ({ editor: nextEditor }) => {
-      if (modeRef.current !== 'wysiwyg' || isStructuredHtmlRef.current) {
+      if (modeRef.current !== 'wysiwyg') {
         return;
       }
 
-      const rawHtml = nextEditor.getHTML();
-      setHtml(stripTokenSpansFromWysiwyg(rawHtml));
+      const nextBodyHtml = stripTokenSpansFromWysiwyg(nextEditor.getHTML());
+
+      if (isStructuredHtmlRef.current) {
+        setHtml((previousHtml) => mergeWysiwygContentIntoSource(previousHtml, nextBodyHtml));
+        return;
+      }
+
+      setHtml(nextBodyHtml);
     }
   });
 
@@ -96,14 +105,6 @@ export default function EditorPage() {
   useEffect(() => {
     isStructuredHtmlRef.current = isStructuredHtml;
   }, [isStructuredHtml]);
-
-  useEffect(() => {
-    if (!editor) {
-      return;
-    }
-
-    editor.setEditable(!isWysiwygSourceLocked);
-  }, [editor, isWysiwygSourceLocked]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -282,10 +283,6 @@ export default function EditorPage() {
       return;
     }
 
-    if (isStructuredHtml) {
-      return;
-    }
-
     if (!editor) {
       setHtml((previousHtml) => `${previousHtml}${token}`);
       return;
@@ -320,8 +317,16 @@ export default function EditorPage() {
   };
 
   const switchToHtmlMode = () => {
-    if (editor && !isStructuredHtml) {
-      setHtml(stripTokenSpansFromWysiwyg(editor.getHTML()));
+    if (editor) {
+      const nextBodyHtml = stripTokenSpansFromWysiwyg(editor.getHTML());
+
+      setHtml((previousHtml) => {
+        if (isStructuredEmailHtml(previousHtml)) {
+          return mergeWysiwygContentIntoSource(previousHtml, nextBodyHtml);
+        }
+
+        return nextBodyHtml;
+      });
     }
 
     setMode('html');
@@ -499,9 +504,9 @@ export default function EditorPage() {
 
           {mode === 'wysiwyg' ? (
             <div className="wysiwyg-container" data-testid="wysiwyg-editor">
-              {isWysiwygSourceLocked ? (
+              {isStructuredHtml ? (
                 <p className="preview-banner" data-testid="wysiwyg-lock-notice">
-                  Ten szablon zawiera pełny HTML e-mail. Źródłem prawdy pozostaje tryb HTML source.
+                  Edytujesz treść w WYSIWYG. Elementy dokumentu (`head`, `title`) edytuj w trybie HTML source.
                 </p>
               ) : null}
               <EditorContent editor={editor} />

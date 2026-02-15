@@ -124,7 +124,7 @@ Zakres:
 
 ---
 
-## Milestone 3.0: Dokument HTML i warning parity (planned)
+## Milestone 3.0: Dokument HTML i warning parity (done)
 
 Cel:
 - domknięcie zgodności między pełnym dokumentem HTML a mechanizmem ostrzeżeń
