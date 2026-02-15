@@ -100,3 +100,45 @@ Zakres:
 
 Uwagi:
 - TODO: PRD nie określa docelowego poziomu pokrycia testami, jedynie konieczność przejścia kryteriów akceptacji.
+
+---
+
+## Milestone 2.5: HTML Rendering Parity — Stabilizacja podglądu (planned)
+
+Cel:
+- przywrócenie spójności między importowanym HTML a panelem preview
+- usunięcie widocznej degradacji layoutu mailowego po przejściu przez edytor
+- zwiększenie wiarygodności podglądu jako źródła decyzji przed eksportem/wysyłką testową
+
+Definition of Done:
+- dla referencyjnego HTML mailowego podgląd zachowuje kluczowe elementy wizualne (nagłówek, treść, CTA, stopka)
+- przełączanie `WYSIWYG` ↔ `HTML source` nie degraduje kluczowego layoutu/stylów maila
+- tokeny `{{...}}` pozostają poprawne semantycznie i nie psują renderowania preview
+- testy regresyjne dla przepływu import -> edycja -> preview przechodzą lokalnie
+
+Zakres:
+- doprecyzowanie i wdrożenie zasad synchronizacji HTML między trybami edycji
+- stabilizacja renderowania mailowych tabel i inline styles w podglądzie
+- zabezpieczenie obsługi tokenów w treści i atrybutach pod kątem poprawności renderowania
+- uzupełnienie testów smoke/regresji dla scenariuszy z referencyjnym HTML
+
+---
+
+## Milestone 3.0: Dokument HTML i warning parity (planned)
+
+Cel:
+- domknięcie zgodności między pełnym dokumentem HTML a mechanizmem ostrzeżeń
+- wyeliminowanie fałszywych alertów wynikających z transformacji pośrednich
+- utrzymanie bezpieczeństwa preview przy jednoczesnym zachowaniu informacji dokumentu
+
+Definition of Done:
+- ostrzeżenie o braku `<title>` nie występuje, gdy `<title>` istnieje w źródłowym HTML
+- mechanizm warnings bazuje na reprezentacji HTML zgodnej z aktualnym draftem użytkownika
+- istnieje udokumentowane rozstrzygnięcie konfliktu WYSIWYG vs pełny dokument HTML (`<html>/<head>/<body>`)
+- testy walidujące warning parity przechodzą lokalnie
+
+Zakres:
+- doprecyzowanie kontraktu wejściowego dla warnings względem źródłowego HTML draftu
+- implementacja i weryfikacja reguł warnings dla metadanych dokumentu
+- utrzymanie bezpiecznego preview bez regresji w blokadzie skryptów
+- aktualizacja dokumentacji projektowej po rozstrzygnięciu konfliktu

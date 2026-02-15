@@ -12,6 +12,8 @@ Docelowym użytkownikiem jest osoba przygotowująca komunikację e-mail (np. mar
 
 Zakres MVP obejmuje workflow jednego szablonu na raz, edycję w trybach WYSIWYG/HTML, podgląd na presetach urządzeń, heurystyczne ostrzeżenia oraz testową wysyłkę przez mockowane API.
 
+Zakres rozszerzony po PRD `001-html-preview-rendering-parity-prd.md` obejmuje także spójność renderowania importowanego HTML między źródłem użytkownika, edytorem i panelem podglądu.
+
 Poza zakresem MVP pozostają: biblioteka szablonów, wersjonowanie/historia, współdzielenie, autentykacja użytkowników, produkcyjna wysyłka oraz serwerowe „naprawianie” HTML.
 
 ---
@@ -29,12 +31,14 @@ Kluczowe use-case’y:
 - edycja treści maila i wstawianie tokenów personalizacji
 - przełączanie między edycją wizualną i kodem HTML
 - podgląd rezultatu w różnych trybach klienta poczty i urządzeniach
+- zachowanie spójności renderowania layoutu/stylów maila między importem i preview
 - wysyłka testowa maila przez endpoint aplikacyjny
 - eksport gotowego HTML i zapis szkicu lokalnie
 
 Główne przepływy użytkownika:
 - wejście przez ekran importu, przygotowanie draftu i przejście do edytora
 - praca iteracyjna: edycja + podgląd + ostrzeżenia + zapis
+- weryfikacja zgodności widoku preview z importowanym HTML (w tym tokeny i kluczowe style)
 - finalizacja: testowa wysyłka lub eksport pliku
 
 Aplikacja nie realizuje:
@@ -67,6 +71,7 @@ Opis architektury na poziomie koncepcyjnym.
 - preview renderuje aktualny HTML ze stanu, z zastosowaniem polityki bezpiecznego podglądu
 - warnings są wyliczane na podstawie HTML i wybranego trybu klienta
 - wysyłka testowa używa bieżącego HTML i metadanych formularza
+- przy zmianach trybu edycji utrzymywana jest spójność semantyczna HTML, aby preview nie tracił kluczowego layoutu i stylów maila
 
 3. Granice odpowiedzialności
 - UI odpowiada za interakcje użytkownika i prezentację
@@ -74,6 +79,7 @@ Opis architektury na poziomie koncepcyjnym.
 - serwisy domenowe odpowiadają za logikę biznesową (warnings, eksport, persist, API client)
 - endpoint testowy odpowiada za kontrakt odpowiedzi do testowej wysyłki w środowisku MVP
 - localStorage odpowiada za lokalną trwałość szkicu, bez synchronizacji wieloużytkownikowej
+- warstwa edytora i preview odpowiada łącznie za brak niezamierzonej degradacji importowanego HTML podczas renderowania
 
 ---
 
@@ -87,6 +93,7 @@ Lista kluczowych komponentów technicznych i ich odpowiedzialności.
 - Tryb HTML source: bezpośrednia edycja surowego kodu HTML.
 - Panel tagów: przeglądanie, wyszukiwanie i wstawianie tokenów personalizacji.
 - Preview iframe: bezpieczny podgląd aktualnego HTML na presetach urządzeń i zoomie.
+- Synchronizacja WYSIWYG <-> HTML: utrzymanie spójności treści i kluczowej semantyki mailowego HTML.
 - WarningsService: heurystyczna analiza kompatybilności i jakości HTML.
 - Draft service (localStorage): autosave/manual save i odtwarzanie szkicu.
 - Email API client + mock route: obsługa testowej wysyłki i standaryzacja odpowiedzi.
@@ -178,6 +185,16 @@ Każda decyzja powinna zawierać:
 - Uzasadnienie: ROADMAP 2.0 wymaga obsługi sukcesu i błędów API oraz spójnego przepływu modalu „Wyślij test”.
 - Konsekwencje: Warstwa UI pozostaje prostsza, a testy kontraktowe endpointu i klienta API są łatwiejsze do utrzymania.
 
+16.
+- Decyzja: [Nowa funkcjonalność PRD 001] W obszarze renderowania HTML źródłem prawdy dla preview, warnings i eksportu pozostaje aktualny HTML draftu, a nie reprezentacja pośrednia zależna od warstwy prezentacyjnej.
+- Uzasadnienie: PRD `001-html-preview-rendering-parity-prd.md` wymaga eliminacji rozjazdu między kodem wejściowym a podglądem.
+- Konsekwencje: Ogranicza ryzyko utraty layoutu/stylów mailowych podczas pracy między trybami edycji.
+
+17.
+- Decyzja: [Nowa funkcjonalność PRD 001] Zidentyfikowano konflikt wymagający doprecyzowania: model edycji WYSIWYG nie odwzorowuje pełnego dokumentu HTML (`<html>/<head>/<body>`), podczas gdy PRD 001 wymaga poprawnej interpretacji elementów dokumentu (np. `<title>`) bez fałszywych ostrzeżeń.
+- Uzasadnienie: Aktualne objawy obejmują ostrzeżenie o braku `<title>` mimo obecności tego znacznika w HTML źródłowym.
+- Konsekwencje: Konflikt pozostaje jawnie otwarty do rozstrzygnięcia w kolejnych milestone’ach; nie jest rozwiązywany na poziomie tej aktualizacji dokumentacji.
+
 ---
 
 ## Jakość i kryteria akceptacji
@@ -187,9 +204,11 @@ Wspólne wymagania jakościowe dla całego projektu.
 - Edytor musi zachowywać spójność treści między trybem WYSIWYG i HTML source.
 - Ostrzeżenia kompatybilności mają charakter informacyjny i nie blokują pracy użytkownika.
 - Podgląd musi działać w bezpiecznym trybie (blokada skryptów) i odzwierciedlać bieżący stan draftu.
+- Podgląd musi zachowywać kluczowy layout i inline style importowanego HTML mailowego (np. tabele, CTA, stopka) bez niezamierzonej degradacji.
 - Trwałość szkicu musi działać lokalnie (autosave + zapis ręczny) oraz poprawnie odtwarzać stan.
 - Funkcje eksportu i wysyłki testowej muszą działać z aktualną wersją HTML draftu.
 - MVP musi działać lokalnie bez zależności od produkcyjnego backendu.
+- Ostrzeżenia nie mogą raportować braków metadanych dokumentu, jeśli elementy istnieją w źródłowym HTML.
 - TODO: Brak w PRD docelowych mierników niefunkcjonalnych (np. limity czasu odpowiedzi UI/API, budżety wydajnościowe).
 
 ---
@@ -215,4 +234,4 @@ Specyfikacja definiuje docelowy zakres MVP i decyzje techniczne, a roadmapa rozk
 - Aktualny zakres obowiązywania:
 - Data utworzenia: TODO (brak daty źródłowej w PRD i repo)
 - Ostatnia aktualizacja: 2026-02-15
-- Aktualny zakres obowiązywania: MVP Edytora E-maili opisany w `prd/000-initial-prd.md`
+- Aktualny zakres obowiązywania: MVP Edytora E-maili opisany w `prd/000-initial-prd.md` oraz rozszerzenie jakościowe z `prd/001-html-preview-rendering-parity-prd.md`
