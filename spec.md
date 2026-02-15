@@ -13,6 +13,7 @@ Docelowym użytkownikiem jest osoba przygotowująca komunikację e-mail (np. mar
 Zakres MVP obejmuje workflow jednego szablonu na raz, edycję w trybach WYSIWYG/HTML, podgląd na presetach urządzeń, heurystyczne ostrzeżenia oraz testową wysyłkę przez mockowane API.
 
 Zakres rozszerzony po PRD `001-html-preview-rendering-parity-prd.md` obejmuje także spójność renderowania importowanego HTML między źródłem użytkownika, edytorem i panelem podglądu.
+Zakres rozszerzony po PRD `002-import-dual-input-dragdrop-prd.md` obejmuje dwa równorzędne wejścia importu na `/import`: wklejenie kodu HTML oraz drag&drop pliku `.html/.htm`.
 
 Poza zakresem MVP pozostają: biblioteka szablonów, wersjonowanie/historia, współdzielenie, autentykacja użytkowników, produkcyjna wysyłka oraz serwerowe „naprawianie” HTML.
 
@@ -28,6 +29,7 @@ Bez wchodzenia w szczegóły implementacyjne.
 
 Kluczowe use-case’y:
 - import HTML przez wklejenie lub upload pliku
+- import HTML przez dedykowany obszar drag&drop pliku `.html/.htm` na ekranie `/import`
 - edycja treści maila i wstawianie tokenów personalizacji
 - przełączanie między edycją wizualną i kodem HTML
 - podgląd rezultatu w różnych trybach klienta poczty i urządzeniach
@@ -36,7 +38,7 @@ Kluczowe use-case’y:
 - eksport gotowego HTML i zapis szkicu lokalnie
 
 Główne przepływy użytkownika:
-- wejście przez ekran importu, przygotowanie draftu i przejście do edytora
+- wejście przez ekran importu, przygotowanie draftu (wklejenie albo drag&drop pliku) i przejście do edytora
 - praca iteracyjna: edycja + podgląd + ostrzeżenia + zapis
 - weryfikacja zgodności widoku preview z importowanym HTML (w tym tokeny i kluczowe style)
 - finalizacja: testowa wysyłka lub eksport pliku
@@ -59,13 +61,13 @@ Opis architektury na poziomie koncepcyjnym.
 
 1. Główne komponenty systemu
 - warstwa routingu aplikacji (`/import`, `/editor`, endpoint testowy API)
-- ekran importu do utworzenia szkicu
+- ekran importu do utworzenia szkicu (textarea + panel drag&drop pliku HTML)
 - ekran edytora z trzema obszarami: tagi, edytor, podgląd
 - warstwa stanu draftu i preferencji podglądu
 - serwisy domenowe: ostrzeżenia, dane tagów/presetów, eksport, wywołanie API testowego
 
 2. Przepływ danych między komponentami
-- użytkownik dostarcza HTML na `/import`, który staje się aktywnym szkicem
+- użytkownik dostarcza HTML na `/import` przez wklejenie lub drop pliku; wynik staje się aktywnym szkicem
 - edytor aktualizuje centralny stan szkicu przy zmianach treści i trybu
 - panel tagów i akcje toolbaru modyfikują ten sam stan draftu
 - preview renderuje aktualny HTML ze stanu, z zastosowaniem polityki bezpiecznego podglądu
@@ -91,6 +93,7 @@ Lista kluczowych komponentów technicznych i ich odpowiedzialności.
 - Store stanu aplikacji (Zustand lub równoważny kontekst): utrzymanie draftu i ustawień podglądu.
 - TipTap: edycja WYSIWYG treści maila.
 - Tryb HTML source: bezpośrednia edycja surowego kodu HTML.
+- Import drag&drop: odczyt i walidacja pojedynczego pliku `.html/.htm` na ekranie importu.
 - Panel tagów: przeglądanie, wyszukiwanie i wstawianie tokenów personalizacji.
 - Preview iframe: bezpieczny podgląd aktualnego HTML na presetach urządzeń i zoomie.
 - Synchronizacja WYSIWYG <-> HTML: utrzymanie spójności treści i kluczowej semantyki mailowego HTML.
@@ -215,12 +218,28 @@ Każda decyzja powinna zawierać:
 - Uzasadnienie: Potrzebne było jednoczesne utrzymanie live preview i ochrona mailowej struktury/layoutu przed degradacją.
 - Konsekwencje: Użytkownik widzi na żywo większość zmian treści z WYSIWYG, a w przypadkach ryzykownych struktura HTML pozostaje nienaruszona.
 
+22.
+- Decyzja: [Nowa funkcjonalność PRD 002] Ekran importu obsługuje dwa równorzędne wejścia HTML: wklejenie kodu oraz drag&drop pojedynczego pliku `.html/.htm` do dedykowanego panelu.
+- Uzasadnienie: PRD `002-import-dual-input-dragdrop-prd.md` wymaga drugiego, bezpośredniego sposobu rozpoczęcia pracy na pliku szablonu.
+- Konsekwencje: Krótszy przepływ startowy dla plików lokalnych i spójne wejście do jednego draftu niezależnie od metody importu.
+
+23.
+- Decyzja: [Nowa funkcjonalność PRD 002] Walidacja importu drag&drop ogranicza się do pojedynczego pliku HTML (`.html/.htm`), a niepoprawny typ pliku zwraca komunikat błędu bez nadpisywania bieżącej zawartości importu.
+- Uzasadnienie: PRD 002 wymaga czytelnej walidacji i ochrony przed utratą aktualnego inputu.
+- Konsekwencje: Brak wsparcia dla multi-file i innych formatów w tym etapie; mniejsze ryzyko regresji obecnego przepływu.
+
+24.
+- Decyzja: [Nowa funkcjonalność PRD 002, Milestone 3.5] Odczyt treści pliku dla importu drag&drop korzysta z `File.text()` z fallbackiem do `FileReader`, aby zachować kompatybilność środowiska runtime i testów.
+- Uzasadnienie: W trakcie implementacji 3.5 ujawniono różnice wsparcia API plikowego między środowiskami; potrzebne było stabilne, minimalne rozwiązanie bez zmiany architektury.
+- Konsekwencje: Spójne zachowanie importu pliku HTML w aplikacji i testach smoke, bez regresji istniejącego przepływu wklejania.
+
 ---
 
 ## Jakość i kryteria akceptacji
 Wspólne wymagania jakościowe dla całego projektu.
 
 - Aplikacja musi przechodzić pełny przepływ MVP: import → edycja → podgląd → eksport/wysyłka testowa.
+- Import musi działać przez oba wejścia (`wklejenie` i `drag&drop` pliku `.html/.htm`) bez regresji istniejącego przepływu.
 - Edytor musi zachowywać spójność treści między trybem WYSIWYG i HTML source.
 - Ostrzeżenia kompatybilności mają charakter informacyjny i nie blokują pracy użytkownika.
 - Podgląd musi działać w bezpiecznym trybie (blokada skryptów) i odzwierciedlać bieżący stan draftu.
@@ -254,4 +273,4 @@ Specyfikacja definiuje docelowy zakres MVP i decyzje techniczne, a roadmapa rozk
 - Aktualny zakres obowiązywania:
 - Data utworzenia: TODO (brak daty źródłowej w PRD i repo)
 - Ostatnia aktualizacja: 2026-02-15
-- Aktualny zakres obowiązywania: MVP Edytora E-maili opisany w `prd/000-initial-prd.md` oraz rozszerzenie jakościowe z `prd/001-html-preview-rendering-parity-prd.md`
+- Aktualny zakres obowiązywania: MVP Edytora E-maili opisany w `prd/000-initial-prd.md` oraz rozszerzenia z `prd/001-html-preview-rendering-parity-prd.md` i `prd/002-import-dual-input-dragdrop-prd.md`

@@ -142,3 +142,45 @@ Zakres:
 - implementacja i weryfikacja reguł warnings dla metadanych dokumentu
 - utrzymanie bezpiecznego preview bez regresji w blokadzie skryptów
 - aktualizacja dokumentacji projektowej po rozstrzygnięciu konfliktu
+
+---
+
+## Milestone 3.5: Import Dual Input — UI + Walidacja (done)
+
+Cel:
+- dodać drugą, równorzędną metodę importu HTML na `/import` obok wklejania kodu
+- umożliwić szybkie załadowanie lokalnego pliku `.html/.htm` przez drag&drop
+- zachować prosty i czytelny UX dla obu metod wejścia
+
+Definition of Done:
+- ekran `/import` zawiera pole wklejania HTML oraz osobny panel drag&drop
+- drop poprawnego pliku `.html/.htm` wczytuje treść do importu
+- drop niepoprawnego pliku pokazuje błąd bez nadpisania aktualnej zawartości importu
+- istniejący przepływ wklejania kodu działa bez regresji
+
+Zakres:
+- implementacja komponentu/panelu drag&drop na `/import`
+- odczyt pojedynczego pliku HTML po stronie klienta
+- walidacja rozszerzenia/typu pliku i komunikaty błędów
+- integracja wyniku importu z istniejącym stanem draftu
+
+---
+
+## Milestone 4.0: Import Dual Input — Domknięcie przepływu i testy (planned)
+
+Cel:
+- domknąć przepływ importu dla dwóch wejść aż do przejścia do `/editor`
+- zapewnić przewidywalne zachowanie po imporcie pliku i po imporcie przez wklejenie
+- potwierdzić stabilność funkcji testami smoke/regresji
+
+Definition of Done:
+- po imporcie przez drag&drop użytkownik może od razu przejść do `/editor` na tym samym draftcie
+- oba wejścia importu (wklejenie i drag&drop) zapisują draft w spójny sposób
+- smoke testy pokrywają oba scenariusze importu
+- testy lokalne przechodzą
+
+Zakres:
+- doprecyzowanie akcji „Otwórz w edytorze” dla obu metod wejścia
+- obsługa stanów granicznych (pusty plik, błędny plik, ponowny drop)
+- aktualizacja i rozszerzenie testów smoke/regresji importu
+- dopięcie komunikatów użytkownika po udanym i nieudanym imporcie pliku
