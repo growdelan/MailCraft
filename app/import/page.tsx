@@ -65,7 +65,7 @@ export default function ImportPage() {
   };
 
   return (
-    <main>
+    <main className="import-page">
       <h1>Edytor E-maili</h1>
       <p>Wklej kod HTML lub użyj przykładowego szablonu.</p>
       <label htmlFor="html-input">HTML</label>
@@ -77,6 +77,7 @@ export default function ImportPage() {
         onChange={(event) => setHtml(event.target.value)}
       />
       <div
+        className={`drop-zone ${isDropActive ? 'is-active' : ''}`}
         data-testid="drop-zone"
         onDragOver={(event) => {
           event.preventDefault();
@@ -88,13 +89,6 @@ export default function ImportPage() {
           setIsDropActive(false);
           await loadHtmlFromFile(event.dataTransfer.files);
         }}
-        style={{
-          marginTop: '12px',
-          padding: '16px',
-          border: '1px dashed #9ca3af',
-          borderRadius: '8px',
-          backgroundColor: isDropActive ? '#eff6ff' : '#f8fafc'
-        }}
       >
         Przeciągnij plik `.html` lub `.htm` i upuść tutaj.
       </div>
@@ -103,7 +97,7 @@ export default function ImportPage() {
           {importError}
         </p>
       ) : null}
-      <div>
+      <div className="import-actions">
         <button type="button" data-testid="sample-button" onClick={() => setHtml(SAMPLE_HTML)}>
           Wstaw przykładowy HTML
         </button>
