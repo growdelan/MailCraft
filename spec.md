@@ -228,6 +228,11 @@ Każda decyzja powinna zawierać:
 - Uzasadnienie: PRD 002 wymaga czytelnej walidacji i ochrony przed utratą aktualnego inputu.
 - Konsekwencje: Brak wsparcia dla multi-file i innych formatów w tym etapie; mniejsze ryzyko regresji obecnego przepływu.
 
+24.
+- Decyzja: [Nowa funkcjonalność PRD 002, Milestone 3.5] Odczyt treści pliku dla importu drag&drop korzysta z `File.text()` z fallbackiem do `FileReader`, aby zachować kompatybilność środowiska runtime i testów.
+- Uzasadnienie: W trakcie implementacji 3.5 ujawniono różnice wsparcia API plikowego między środowiskami; potrzebne było stabilne, minimalne rozwiązanie bez zmiany architektury.
+- Konsekwencje: Spójne zachowanie importu pliku HTML w aplikacji i testach smoke, bez regresji istniejącego przepływu wklejania.
+
 ---
 
 ## Jakość i kryteria akceptacji

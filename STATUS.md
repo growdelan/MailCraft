@@ -20,6 +20,8 @@
 - Dla pełnych szablonów HTML źródłowy dokument (`head/title/body`) pozostaje spójny, a podgląd i warnings bazują na aktualnym draftcie.
 - WYSIWYG pozostaje edytowalny dla pełnego HTML; zmiany treści są synchronizowane live do preview bez niszczenia struktury maila.
 - Warning `<title>` nie pojawia się, jeśli `<title>` istnieje w źródłowym dokumencie HTML.
+- Import na `/import` działa dwiema metodami: wklejenie kodu i drag&drop pliku `.html/.htm`.
+- Dla drag&drop działa walidacja pojedynczego pliku HTML oraz komunikaty błędów bez nadpisywania aktualnej treści importu.
 
 ## Co jest skończone
 - Milestone 0.5: Minimal end-to-end slice.
@@ -28,6 +30,7 @@
 - Milestone 2.0: Send Test + Export + Domknięcie MVP.
 - Milestone 2.5: HTML Rendering Parity — Stabilizacja podglądu.
 - Milestone 3.0: Dokument HTML i warning parity.
+- Milestone 3.5: Import Dual Input — UI + Walidacja.
 - Minimalna konfiguracja projektu Next.js + TypeScript + Vitest.
 - Dokumentacja uruchomienia i testów w `README.md`.
 
@@ -35,7 +38,7 @@
 - Brak aktywnego milestone’u w statusie `in_progress`.
 
 ## Co jest następne
-- Brak kolejnego milestone’u w roadmapie.
+- Milestone 4.0: Import Dual Input — Domknięcie przepływu i testy.
 
 ## Blokery i ryzyka
 - Brak blockerów krytycznych na ten moment.
@@ -48,3 +51,4 @@
 - 2026-02-15: Zakończono Milestone 2.0 i oznaczono go jako `done` w `ROADMAP.md`.
 - 2026-02-15: Zakończono Milestone 2.5 i oznaczono go jako `done` w `ROADMAP.md`.
 - 2026-02-15: Zakończono Milestone 3.0 i oznaczono go jako `done` w `ROADMAP.md`.
+- 2026-02-15: Zakończono Milestone 3.5 i oznaczono go jako `done` w `ROADMAP.md`.

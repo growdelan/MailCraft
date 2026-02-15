@@ -145,7 +145,7 @@ Zakres:
 
 ---
 
-## Milestone 3.5: Import Dual Input — UI + Walidacja (planned)
+## Milestone 3.5: Import Dual Input — UI + Walidacja (done)
 
 Cel:
 - dodać drugą, równorzędną metodę importu HTML na `/import` obok wklejania kodu
