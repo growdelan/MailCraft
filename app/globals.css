@@ -338,11 +338,32 @@ button:disabled {
 }
 
 .ee-tag-item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
   cursor: grab;
 }
 
-.ee-tag-item button {
-  margin-left: 6px;
+.ee-tag-item .tag-token {
+  width: 100%;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.ee-tag-item .tag-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.ee-tag-item .tag-actions button {
+  min-width: 96px;
+  margin: 0;
+  padding: 7px 12px;
 }
 
 .ee-drop-target {
@@ -554,5 +575,9 @@ details summary {
 
   .ee-email-canvas {
     min-height: 440px;
+  }
+
+  .ee-tag-item .tag-actions {
+    justify-content: flex-start;
   }
 }

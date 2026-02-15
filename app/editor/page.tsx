@@ -464,18 +464,20 @@ export default function EditorPage() {
                 <ul>
                   {items.map((tag) => (
                     <li key={tag.key} className="ee-tag-item">
-                      <span>{tag.token}</span>
-                      <button
-                        type="button"
-                        draggable
-                        onDragStart={(event) => onTagDragStart(event, tag.token)}
-                        onClick={() => insertToken(tag.token)}
-                      >
-                        Wstaw
-                      </button>
-                      <button type="button" onClick={() => copyToken(tag.token)}>
-                        Kopiuj
-                      </button>
+                      <span className="tag-token">{tag.token}</span>
+                      <div className="tag-actions">
+                        <button
+                          type="button"
+                          draggable
+                          onDragStart={(event) => onTagDragStart(event, tag.token)}
+                          onClick={() => insertToken(tag.token)}
+                        >
+                          Wstaw
+                        </button>
+                        <button type="button" onClick={() => copyToken(tag.token)}>
+                          Kopiuj
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>
