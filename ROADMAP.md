@@ -208,7 +208,7 @@ Zakres:
 
 ---
 
-## Milestone 5.0: Premium UI Polish + Consistency (planned)
+## Milestone 5.0: Premium UI Polish + Consistency (done)
 
 Cel:
 - domknąć spójność wizualną premium na `/import` i `/editor`

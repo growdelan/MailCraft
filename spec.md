@@ -252,6 +252,11 @@ Każda decyzja powinna zawierać:
 - Uzasadnienie: Milestone 4.5 wymaga spójności bazowej i niskiego ryzyka regresji funkcjonalnej przy zmianach wizualnych.
 - Konsekwencje: Kolejny etap polish (`5.0`) może skupić się na dopracowaniu detali, bez przebudowy fundamentu stylów.
 
+28.
+- Decyzja: [Nowa funkcjonalność PRD 003, Milestone 5.0] W panelu tagów układ pozycji jest pionowy: nazwa tokenu zawsze w osobnym wierszu nad zestawem akcji (`Wstaw`, `Kopiuj`).
+- Uzasadnienie: W trakcie polishu premium UI pojawił się problem łamania i rozjeżdżania elementów na węższych szerokościach; stabilny układ pionowy usuwa kolizje i poprawia czytelność.
+- Konsekwencje: Karty tagów są bardziej przewidywalne responsywnie i zachowują spójny wygląd premium bez zmiany logiki działania akcji.
+
 ---
 
 ## Jakość i kryteria akceptacji

@@ -25,6 +25,7 @@
 - Globalna warstwa UI ma foundation premium SaaS: gradient lawenda -> błękit, szkliste powierzchnie i subtelny blur.
 - Podstawowe komponenty interakcyjne (`button`, `input`, `select`, `textarea`, panele, toolbar, modal) mają spójne stany hover/focus/disabled.
 - Widok `/import` jest wizualnie spójny z nowym foundation (`import-page`, panel drop-zone, sekcja akcji).
+- Widok `/editor` i panel tagów mają domknięty polish premium UI; układ pozycji tagu jest stabilny (nazwa tagu nad przyciskami akcji), bez rozjeżdżania na węższych szerokościach.
 
 ## Co jest skończone
 - Milestone 0.5: Minimal end-to-end slice.
@@ -35,6 +36,7 @@
 - Milestone 3.0: Dokument HTML i warning parity.
 - Milestone 3.5: Import Dual Input — UI + Walidacja.
 - Milestone 4.5: Premium UI Foundation.
+- Milestone 5.0: Premium UI Polish + Consistency.
 - Minimalna konfiguracja projektu Next.js + TypeScript + Vitest.
 - Dokumentacja uruchomienia i testów w `README.md`.
 
@@ -42,7 +44,7 @@
 - Brak aktywnego milestone’u w statusie `in_progress`.
 
 ## Co jest następne
-- Milestone 5.0: Premium UI Polish + Consistency.
+- TODO: Brak kolejnego milestone’u w `ROADMAP.md` po 5.0. Należy zdefiniować następny etap.
 
 ## Blokery i ryzyka
 - Brak blockerów krytycznych na ten moment.
@@ -58,3 +60,4 @@
 - 2026-02-15: Zakończono Milestone 3.0 i oznaczono go jako `done` w `ROADMAP.md`.
 - 2026-02-15: Zakończono Milestone 3.5 i oznaczono go jako `done` w `ROADMAP.md`.
 - 2026-02-15: Zakończono Milestone 4.5 i oznaczono go jako `done` w `ROADMAP.md`.
+- 2026-02-15: Zakończono Milestone 5.0 i oznaczono go jako `done` w `ROADMAP.md`.
