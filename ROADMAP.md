@@ -55,7 +55,7 @@ Uwagi:
 
 ---
 
-## Milestone 1.5: Preview + Warnings + Responsywność (planned)
+## Milestone 1.5: Preview + Warnings + Responsywność (done)
 
 Cel:
 - dostarczenie wiarygodnego podglądu maila dla kluczowych presetów i trybów klienta

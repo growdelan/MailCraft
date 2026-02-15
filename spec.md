@@ -152,6 +152,22 @@ Każda decyzja powinna zawierać:
 - Uzasadnienie: ROADMAP 1.0 wymaga wizualnego wyróżnienia tokenów i wspólnej logiki insert tokenów.
 - Konsekwencje: Wstawione tokeny są czytelne i trudniejsze do przypadkowej edycji, a w stanie draftu przechowywane są jako zwykłe placeholdery `{{...}}`.
 
+
+11.
+- Decyzja: Podgląd w Milestone 1.5 renderuje HTML w `iframe srcDoc` po sanitacji usuwającej znaczniki `<script>`, bez `allow-scripts` w sandbox.
+- Uzasadnienie: ROADMAP 1.5 wymaga bezpiecznego preview i jawnej blokady skryptów.
+- Konsekwencje: Podgląd jest bliższy realnym klientom poczty i ogranicza ryzyko wykonania niebezpiecznego kodu.
+
+12.
+- Decyzja: Ostrzeżenia kompatybilności realizuje dedykowany `WarningsService` oparty o heurystyczne reguły zależne od `client mode`.
+- Uzasadnienie: ROADMAP 1.5 wymaga nieblokujących warnings zależnych od trybu klienta.
+- Konsekwencje: Ostrzeżenia są szybkie i przewidywalne, ale mają charakter informacyjny (heurystyczny), nie gwarancyjny.
+
+13.
+- Decyzja: Dekorowanie tokenów w WYSIWYG działa wyłącznie na węzłach tekstowych DOM, bez modyfikacji atrybutów HTML.
+- Uzasadnienie: Podczas 1.5 wykryto błąd zniekształcania HTML w preview przy tokenach osadzonych w atrybutach (np. `href`).
+- Konsekwencje: Stabilniejsza synchronizacja WYSIWYG <-> HTML i poprawny podgląd dla szablonów z tokenami w atrybutach.
+
 ---
 
 ## Jakość i kryteria akceptacji
