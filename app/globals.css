@@ -1,0 +1,38 @@
+:root {
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 24px;
+  background: #f7f7f7;
+  color: #111;
+}
+
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 240px;
+  margin-top: 8px;
+}
+
+button {
+  margin-top: 8px;
+  margin-right: 8px;
+}
+
+pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 12px;
+}
