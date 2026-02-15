@@ -1,6 +1,6 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import ImportPage from '../app/import/page';
 import { loadDraft } from '../lib/draft-service';
@@ -13,6 +13,10 @@ vi.mock('next/navigation', () => ({
     replace: vi.fn()
   })
 }));
+
+afterEach(() => {
+  cleanup();
+});
 
 describe('smoke', () => {
   it('import sample html and open editor flow', () => {
@@ -65,5 +69,45 @@ describe('smoke', () => {
     expect(draft).not.toBeNull();
     expect(draft?.html).toBe('<p>legacy</p>');
     expect(draft?.mode).toBe('wysiwyg');
+  });
+
+  it('loads html from dropped file into import textarea', async () => {
+    render(<ImportPage />);
+
+    const dropZone = screen.getByTestId('drop-zone');
+    const htmlFile = new File(['<p>from-file</p>'], 'template.html', { type: 'text/html' });
+
+    fireEvent.drop(dropZone, {
+      dataTransfer: {
+        files: [htmlFile]
+      }
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('html-input')).toHaveValue('<p>from-file</p>');
+    });
+
+    expect(screen.getByTestId('open-button')).not.toBeDisabled();
+  });
+
+  it('shows validation error for non-html dropped file and keeps current input', async () => {
+    render(<ImportPage />);
+
+    fireEvent.change(screen.getByTestId('html-input'), { target: { value: '<p>keep</p>' } });
+
+    const dropZone = screen.getByTestId('drop-zone');
+    const invalidFile = new File(['not html'], 'notes.txt', { type: 'text/plain' });
+
+    fireEvent.drop(dropZone, {
+      dataTransfer: {
+        files: [invalidFile]
+      }
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('import-error')).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId('html-input')).toHaveValue('<p>keep</p>');
   });
 });
