@@ -9,7 +9,7 @@ Dozwolone statusy:
 
 ---
 
-## Milestone 0.5: Minimal end-to-end slice (planned)
+## Milestone 0.5: Minimal end-to-end slice (done)
 
 Cel:
 - aplikacja uruchamia się i prowadzi użytkownika do rozpoczęcia pracy nad draftem
