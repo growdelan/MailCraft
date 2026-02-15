@@ -66,37 +66,51 @@ export default function ImportPage() {
 
   return (
     <main className="import-page">
-      <h1>Edytor E-maili</h1>
-      <p>Wklej kod HTML lub użyj przykładowego szablonu.</p>
-      <label htmlFor="html-input">HTML</label>
-      <textarea
-        id="html-input"
-        data-testid="html-input"
-        placeholder="Wklej tutaj kod HTML..."
-        value={html}
-        onChange={(event) => setHtml(event.target.value)}
-      />
-      <div
-        className={`drop-zone ${isDropActive ? 'is-active' : ''}`}
-        data-testid="drop-zone"
-        onDragOver={(event) => {
-          event.preventDefault();
-          setIsDropActive(true);
-        }}
-        onDragLeave={() => setIsDropActive(false)}
-        onDrop={async (event) => {
-          event.preventDefault();
-          setIsDropActive(false);
-          await loadHtmlFromFile(event.dataTransfer.files);
-        }}
-      >
-        Przeciągnij plik `.html` lub `.htm` i upuść tutaj.
-      </div>
-      {importError ? (
-        <p data-testid="import-error" role="alert">
-          {importError}
-        </p>
-      ) : null}
+      <header className="import-hero">
+        <h1>Edytor E-maili</h1>
+        <p>Wklej kod HTML lub użyj przykładowego szablonu.</p>
+      </header>
+
+      <section className="import-grid">
+        <article className="import-card">
+          <h2>Kod HTML</h2>
+          <label htmlFor="html-input">Wklej treść szablonu</label>
+          <textarea
+            id="html-input"
+            data-testid="html-input"
+            placeholder="Wklej tutaj kod HTML..."
+            value={html}
+            onChange={(event) => setHtml(event.target.value)}
+          />
+        </article>
+
+        <article className="import-card">
+          <h2>Plik HTML</h2>
+          <p className="import-card-copy">Przeciągnij plik z dysku, aby szybko rozpocząć edycję.</p>
+          <div
+            className={`drop-zone ${isDropActive ? 'is-active' : ''}`}
+            data-testid="drop-zone"
+            onDragOver={(event) => {
+              event.preventDefault();
+              setIsDropActive(true);
+            }}
+            onDragLeave={() => setIsDropActive(false)}
+            onDrop={async (event) => {
+              event.preventDefault();
+              setIsDropActive(false);
+              await loadHtmlFromFile(event.dataTransfer.files);
+            }}
+          >
+            Przeciągnij plik `.html` lub `.htm` i upuść tutaj.
+          </div>
+          {importError ? (
+            <p data-testid="import-error" role="alert">
+              {importError}
+            </p>
+          ) : null}
+        </article>
+      </section>
+
       <div className="import-actions">
         <button type="button" data-testid="sample-button" onClick={() => setHtml(SAMPLE_HTML)}>
           Wstaw przykładowy HTML
