@@ -14,6 +14,7 @@ Zakres MVP obejmuje workflow jednego szablonu na raz, edycję w trybach WYSIWYG/
 
 Zakres rozszerzony po PRD `001-html-preview-rendering-parity-prd.md` obejmuje także spójność renderowania importowanego HTML między źródłem użytkownika, edytorem i panelem podglądu.
 Zakres rozszerzony po PRD `002-import-dual-input-dragdrop-prd.md` obejmuje dwa równorzędne wejścia importu na `/import`: wklejenie kodu HTML oraz drag&drop pliku `.html/.htm`.
+Zakres rozszerzony po PRD `003-premium-saas-ui-refresh-prd.md` obejmuje odświeżenie warstwy wizualnej aplikacji w stylu premium SaaS (glassmorphism + gradient lawenda -> błękit) bez zmiany logiki funkcjonalnej.
 
 Poza zakresem MVP pozostają: biblioteka szablonów, wersjonowanie/historia, współdzielenie, autentykacja użytkowników, produkcyjna wysyłka oraz serwerowe „naprawianie” HTML.
 
@@ -34,6 +35,7 @@ Kluczowe use-case’y:
 - przełączanie między edycją wizualną i kodem HTML
 - podgląd rezultatu w różnych trybach klienta poczty i urządzeniach
 - zachowanie spójności renderowania layoutu/stylów maila między importem i preview
+- spójny, nowoczesny i premium wygląd UI na stronach `/import` i `/editor`
 - wysyłka testowa maila przez endpoint aplikacyjny
 - eksport gotowego HTML i zapis szkicu lokalnie
 
@@ -82,6 +84,7 @@ Opis architektury na poziomie koncepcyjnym.
 - endpoint testowy odpowiada za kontrakt odpowiedzi do testowej wysyłki w środowisku MVP
 - localStorage odpowiada za lokalną trwałość szkicu, bez synchronizacji wieloużytkownikowej
 - warstwa edytora i preview odpowiada łącznie za brak niezamierzonej degradacji importowanego HTML podczas renderowania
+- warstwa stylów odpowiada za premium spójność wizualną bez ingerencji w przepływy biznesowe
 
 ---
 
@@ -101,6 +104,7 @@ Lista kluczowych komponentów technicznych i ich odpowiedzialności.
 - Draft service (localStorage): autosave/manual save i odtwarzanie szkicu.
 - Email API client + mock route: obsługa testowej wysyłki i standaryzacja odpowiedzi.
 - Warstwa UI (shadcn/ui + Tailwind): spójne komponenty i stylowanie aplikacji.
+- Globalne tokeny designu i style glassmorphism: gradient tła, szkliste panele, blur oraz nowoczesne stany interakcji.
 
 ---
 
@@ -233,6 +237,26 @@ Każda decyzja powinna zawierać:
 - Uzasadnienie: W trakcie implementacji 3.5 ujawniono różnice wsparcia API plikowego między środowiskami; potrzebne było stabilne, minimalne rozwiązanie bez zmiany architektury.
 - Konsekwencje: Spójne zachowanie importu pliku HTML w aplikacji i testach smoke, bez regresji istniejącego przepływu wklejania.
 
+25.
+- Decyzja: [Nowa funkcjonalność PRD 003] Odświeżenie premium SaaS realizujemy wyłącznie na warstwie wizualnej (style, tokeny designu, komponenty UI), bez modyfikacji logiki domenowej i przepływów użytkownika.
+- Uzasadnienie: PRD `003-premium-saas-ui-refresh-prd.md` wymaga poprawy jakości odbioru wizualnego bez regresji funkcjonalnych.
+- Konsekwencje: Zmiany mogą być wdrażane iteracyjnie i testowane wizualnie, przy niskim ryzyku wpływu na działanie aplikacji.
+
+26.
+- Decyzja: [Nowa funkcjonalność PRD 003] Kierunek wizualny obejmuje delikatny gradient tła (lawenda -> błękit), szkliste karty (glassmorphism), subtelne rozmycie i nowoczesne stany komponentów z zachowaniem czytelności/kontrastu.
+- Uzasadnienie: Jest to bezpośredni wymóg estetyczny nowego PRD.
+- Konsekwencje: Konieczne jest ujednolicenie stylu między `/import` i `/editor` oraz kontrola intensywności efektów, aby nie pogorszyć użyteczności.
+
+27.
+- Decyzja: [Nowa funkcjonalność PRD 003, Milestone 4.5] Foundation premium UI została osadzona globalnie w `app/globals.css` przez tokeny designu i wspólne style komponentów (karty/panele/kontrolki/toolbar/modal), zamiast punktowych override’ów per widok.
+- Uzasadnienie: Milestone 4.5 wymaga spójności bazowej i niskiego ryzyka regresji funkcjonalnej przy zmianach wizualnych.
+- Konsekwencje: Kolejny etap polish (`5.0`) może skupić się na dopracowaniu detali, bez przebudowy fundamentu stylów.
+
+28.
+- Decyzja: [Nowa funkcjonalność PRD 003, Milestone 5.0] W panelu tagów układ pozycji jest pionowy: nazwa tokenu zawsze w osobnym wierszu nad zestawem akcji (`Wstaw`, `Kopiuj`).
+- Uzasadnienie: W trakcie polishu premium UI pojawił się problem łamania i rozjeżdżania elementów na węższych szerokościach; stabilny układ pionowy usuwa kolizje i poprawia czytelność.
+- Konsekwencje: Karty tagów są bardziej przewidywalne responsywnie i zachowują spójny wygląd premium bez zmiany logiki działania akcji.
+
 ---
 
 ## Jakość i kryteria akceptacji
@@ -244,6 +268,7 @@ Wspólne wymagania jakościowe dla całego projektu.
 - Ostrzeżenia kompatybilności mają charakter informacyjny i nie blokują pracy użytkownika.
 - Podgląd musi działać w bezpiecznym trybie (blokada skryptów) i odzwierciedlać bieżący stan draftu.
 - Podgląd musi zachowywać kluczowy layout i inline style importowanego HTML mailowego (np. tabele, CTA, stopka) bez niezamierzonej degradacji.
+- UI powinno zachować spójny premium wygląd SaaS (glass cards + gradient + subtelny blur) bez pogorszenia czytelności na desktopie i mobile.
 - Trwałość szkicu musi działać lokalnie (autosave + zapis ręczny) oraz poprawnie odtwarzać stan.
 - Funkcje eksportu i wysyłki testowej muszą działać z aktualną wersją HTML draftu.
 - MVP musi działać lokalnie bez zależności od produkcyjnego backendu.
@@ -273,4 +298,4 @@ Specyfikacja definiuje docelowy zakres MVP i decyzje techniczne, a roadmapa rozk
 - Aktualny zakres obowiązywania:
 - Data utworzenia: TODO (brak daty źródłowej w PRD i repo)
 - Ostatnia aktualizacja: 2026-02-15
-- Aktualny zakres obowiązywania: MVP Edytora E-maili opisany w `prd/000-initial-prd.md` oraz rozszerzenia z `prd/001-html-preview-rendering-parity-prd.md` i `prd/002-import-dual-input-dragdrop-prd.md`
+- Aktualny zakres obowiązywania: MVP Edytora E-maili opisany w `prd/000-initial-prd.md` oraz rozszerzenia z `prd/001-html-preview-rendering-parity-prd.md`, `prd/002-import-dual-input-dragdrop-prd.md` i `prd/003-premium-saas-ui-refresh-prd.md`

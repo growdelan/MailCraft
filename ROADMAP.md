@@ -184,3 +184,45 @@ Zakres:
 - obsługa stanów granicznych (pusty plik, błędny plik, ponowny drop)
 - aktualizacja i rozszerzenie testów smoke/regresji importu
 - dopięcie komunikatów użytkownika po udanym i nieudanym imporcie pliku
+
+---
+
+## Milestone 4.5: Premium UI Foundation (done)
+
+Cel:
+- zdefiniować spójny kierunek wizualny premium SaaS dla całej aplikacji
+- wdrożyć bazowe tokeny i style globalne (gradient, glass, blur, cienie, radius)
+- poprawić odbiór wizualny bez zmiany logiki funkcjonalnej
+
+Definition of Done:
+- globalny motyw UI zawiera gradient lawenda -> błękit i podstawowe tokeny premium
+- panele/karty kluczowych widoków używają stylu glassmorphism
+- podstawowe komponenty interakcyjne (button/input/tabs/toolbar) mają spójne stany hover/focus/disabled
+- istniejące funkcje i przepływy działają bez regresji
+
+Zakres:
+- aktualizacja warstwy stylów globalnych i zmiennych UI
+- wprowadzenie szklistego wyglądu kart i paneli
+- dopasowanie stylów podstawowych komponentów kontrolnych
+- zachowanie responsywności i czytelności interfejsu
+
+---
+
+## Milestone 5.0: Premium UI Polish + Consistency (done)
+
+Cel:
+- domknąć spójność wizualną premium na `/import` i `/editor`
+- dopracować szczegóły estetyczne oraz mikrointerakcje UI
+- zapewnić wysoki poziom czytelności i użyteczności po redesignie
+
+Definition of Done:
+- oba główne widoki (`/import`, `/editor`) mają jednolity, nowoczesny styl premium
+- sekcje ostrzeżeń, preview shell, panele i akcje toolbaru są wizualnie spójne
+- UI zachowuje czytelność na desktopie i mobile
+- testy lokalne przechodzą i nie występują regresje funkcjonalne
+
+Zakres:
+- ujednolicenie finalnych stylów między ekranami
+- dopracowanie detali wizualnych (spacing, kontrast, hierarchy, subtle motion)
+- korekty stanów komponentów w kontekście dostępności i czytelności
+- finalna weryfikacja regresji funkcjonalnych po odświeżeniu UI
