@@ -31,7 +31,7 @@ Zakres:
 
 ---
 
-## Milestone 1.0: Editor Core + Tokens (planned)
+## Milestone 1.0: Editor Core + Tokens (done)
 
 Cel:
 - dostarczenie pełnego rdzenia edytora w dwóch trybach (WYSIWYG i HTML source)

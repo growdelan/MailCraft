@@ -142,6 +142,16 @@ Każda decyzja powinna zawierać:
 - Uzasadnienie: ROADMAP dla 0.5 wymaga minimalnego przepływu importu do `/editor`; upload nie jest wymagany na tym etapie.
 - Konsekwencje: Najkrótsza ścieżka end-to-end jest dostępna od razu, a upload zostaje na kolejne milestone’y.
 
+9.
+- Decyzja: Integracja trybu WYSIWYG w Milestone 1.0 została oparta o `@tiptap/react`, `@tiptap/core` i `@tiptap/starter-kit`.
+- Uzasadnienie: ROADMAP 1.0 wymaga bezpośredniej integracji TipTap i przełączania WYSIWYG/HTML source.
+- Konsekwencje: WYSIWYG działa w zgodzie z PRD, a logika synchronizacji z trybem HTML pozostaje jawna i utrzymywana w warstwie edytora.
+
+10.
+- Decyzja: Tokeny w WYSIWYG są reprezentowane jako atomowy inline node `emailToken` renderowany jako `.ee-token`.
+- Uzasadnienie: ROADMAP 1.0 wymaga wizualnego wyróżnienia tokenów i wspólnej logiki insert tokenów.
+- Konsekwencje: Wstawione tokeny są czytelne i trudniejsze do przypadkowej edycji, a w stanie draftu przechowywane są jako zwykłe placeholdery `{{...}}`.
+
 ---
 
 ## Jakość i kryteria akceptacji
