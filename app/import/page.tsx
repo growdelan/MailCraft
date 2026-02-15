@@ -4,7 +4,7 @@ import React from 'react';
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const DRAFT_KEY = 'email-editor-draft';
+import { createDraft, saveDraft } from '../../lib/draft-service';
 
 const SAMPLE_HTML = `<!doctype html>
 <html>
@@ -27,7 +27,7 @@ export default function ImportPage() {
       return;
     }
 
-    localStorage.setItem(DRAFT_KEY, html);
+    saveDraft(createDraft(html));
     router.push('/editor');
   };
 
