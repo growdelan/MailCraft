@@ -195,6 +195,11 @@ Każda decyzja powinna zawierać:
 - Uzasadnienie: Aktualne objawy obejmują ostrzeżenie o braku `<title>` mimo obecności tego znacznika w HTML źródłowym.
 - Konsekwencje: Konflikt pozostaje jawnie otwarty do rozstrzygnięcia w kolejnych milestone’ach; nie jest rozwiązywany na poziomie tej aktualizacji dokumentacji.
 
+18.
+- Decyzja: [Nowa funkcjonalność PRD 001, Milestone 2.5] Dla szablonów zawierających pełny/mailowy HTML dokumentu (`<!doctype>`, `<html>/<head>/<body>` lub layout tabelkowy) tryb `HTML source` jest źródłem prawdy, a WYSIWYG nie nadpisuje surowego HTML.
+- Uzasadnienie: Najprostszy wariant eliminujący degradację layoutu i inline styles podczas synchronizacji przez edytor WYSIWYG.
+- Konsekwencje: Preview, warnings i eksport pozostają spójne z kodem wejściowym; edycja takich szablonów powinna być wykonywana głównie w `HTML source`.
+
 ---
 
 ## Jakość i kryteria akceptacji

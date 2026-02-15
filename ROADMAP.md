@@ -103,7 +103,7 @@ Uwagi:
 
 ---
 
-## Milestone 2.5: HTML Rendering Parity — Stabilizacja podglądu (planned)
+## Milestone 2.5: HTML Rendering Parity — Stabilizacja podglądu (done)
 
 Cel:
 - przywrócenie spójności między importowanym HTML a panelem preview
