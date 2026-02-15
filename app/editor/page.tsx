@@ -9,6 +9,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { CLIENT_MODES } from '../../lib/client-modes';
 import { DEVICE_PRESETS, ZOOM_PRESETS, ZoomPreset } from '../../lib/devices';
 import { Draft, DraftMode, loadDraft, saveDraft } from '../../lib/draft-service';
+import { SendTestError, SendTestResponse, sendTestEmail } from '../../lib/email-api';
 import { EmailToken } from '../../lib/email-token-extension';
 import { sanitizePreviewHtml } from '../../lib/preview-service';
 import { TAG_CATEGORIES, TAGS } from '../../lib/tag-service';
@@ -36,6 +37,12 @@ export default function EditorPage() {
   const [mobileTab, setMobileTab] = useState<MobileTab>('editor');
   const [previewHtml, setPreviewHtml] = useState('');
   const [hasBlockedScripts, setHasBlockedScripts] = useState(false);
+  const [isSendModalOpen, setIsSendModalOpen] = useState(false);
+  const [testTo, setTestTo] = useState('');
+  const [testSubject, setTestSubject] = useState('[TEST] Podgląd maila');
+  const [testError, setTestError] = useState<string | null>(null);
+  const [testResult, setTestResult] = useState<SendTestResponse | null>(null);
+  const [isSending, setIsSending] = useState(false);
 
   const editor = useEditor({
     extensions: [StarterKit, EmailToken],
@@ -154,6 +161,73 @@ export default function EditorPage() {
 
     saveDraft(nextDraft);
     setLastSavedDraft(nextDraft);
+  };
+
+  const exportHtml = () => {
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+
+    anchor.href = url;
+    anchor.download = 'email.html';
+    anchor.click();
+
+    window.URL.revokeObjectURL(url);
+  };
+
+  const openSendModal = () => {
+    setTestError(null);
+    setTestResult(null);
+    setIsSendModalOpen(true);
+  };
+
+  const closeSendModal = () => {
+    if (isSending) {
+      return;
+    }
+
+    setIsSendModalOpen(false);
+  };
+
+  const submitSendTest = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const normalizedEmail = testTo.trim();
+    const normalizedSubject = testSubject.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      setTestError('Wprowadź poprawny adres e-mail.');
+      return;
+    }
+
+    if (!normalizedSubject) {
+      setTestError('Temat wiadomości jest wymagany.');
+      return;
+    }
+
+    setIsSending(true);
+    setTestError(null);
+    setTestResult(null);
+
+    try {
+      const response = await sendTestEmail({
+        to: normalizedEmail,
+        subject: normalizedSubject,
+        html
+      });
+
+      setTestResult(response);
+    } catch (error) {
+      const apiError = error as SendTestError & { status?: number };
+      const errorMessage = apiError.message ?? 'Nie udało się wysłać wiadomości testowej.';
+      const statusPart = apiError.status ? `HTTP ${apiError.status}: ` : '';
+      const detailsPart =
+        apiError.details && Object.keys(apiError.details).length > 0
+          ? ` | details: ${JSON.stringify(apiError.details)}`
+          : '';
+      setTestError(`${statusPart}${errorMessage}${detailsPart}`);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const insertToken = (token: string) => {
@@ -280,8 +354,14 @@ export default function EditorPage() {
         </div>
 
         <div className="toolbar-actions">
+          <button type="button" onClick={exportHtml} data-testid="export-button">
+            Eksportuj HTML
+          </button>
           <button type="button" onClick={saveNow} data-testid="manual-save-button">
             Zapisz szkic
+          </button>
+          <button type="button" onClick={openSendModal} data-testid="send-test-button">
+            Wyślij test
           </button>
         </div>
       </header>
@@ -422,6 +502,51 @@ export default function EditorPage() {
           </div>
         </section>
       </div>
+
+      {isSendModalOpen ? (
+        <div className="modal-backdrop" data-testid="send-test-modal">
+          <div className="modal-content">
+            <h3>Wyślij test</h3>
+            <form onSubmit={submitSendTest}>
+              <label>
+                To
+                <input
+                  type="email"
+                  required
+                  value={testTo}
+                  onChange={(event) => setTestTo(event.target.value)}
+                  placeholder="user@example.com"
+                />
+              </label>
+              <label>
+                Subject
+                <input
+                  type="text"
+                  required
+                  value={testSubject}
+                  onChange={(event) => setTestSubject(event.target.value)}
+                />
+              </label>
+
+              {testError ? <p className="modal-error">{testError}</p> : null}
+              {testResult ? (
+                <p className="modal-success">
+                  Wysłano test. Message ID: <strong>{testResult.messageId}</strong>
+                </p>
+              ) : null}
+
+              <div className="modal-actions">
+                <button type="submit" disabled={isSending}>
+                  {isSending ? 'Wysyłanie...' : 'Wyślij'}
+                </button>
+                <button type="button" onClick={closeSendModal} disabled={isSending}>
+                  Zamknij
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

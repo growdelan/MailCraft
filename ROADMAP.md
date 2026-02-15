@@ -79,7 +79,7 @@ Uwagi:
 
 ---
 
-## Milestone 2.0: Send Test + Export + Domknięcie MVP (planned)
+## Milestone 2.0: Send Test + Export + Domknięcie MVP (done)
 
 Cel:
 - zamknięcie pełnego przepływu MVP od importu do testowej wysyłki i eksportu

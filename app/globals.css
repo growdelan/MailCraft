@@ -30,6 +30,12 @@ button {
   margin-right: 8px;
 }
 
+input,
+select {
+  margin-top: 6px;
+  padding: 6px 8px;
+}
+
 .editor-page {
   display: flex;
   flex-direction: column;
@@ -227,6 +233,59 @@ button {
 .ee-email-container {
   background: #fff;
   border: 1px solid #d1d5db;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+}
+
+.modal-content {
+  width: 420px;
+  max-width: calc(100vw - 24px);
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid #d1d5db;
+}
+
+.modal-content h3 {
+  margin: 0 0 10px;
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-content label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.modal-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.modal-success {
+  margin: 0;
+  color: #166534;
+  font-size: 14px;
 }
 
 @media (max-width: 900px) {

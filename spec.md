@@ -168,6 +168,16 @@ Każda decyzja powinna zawierać:
 - Uzasadnienie: Podczas 1.5 wykryto błąd zniekształcania HTML w preview przy tokenach osadzonych w atrybutach (np. `href`).
 - Konsekwencje: Stabilniejsza synchronizacja WYSIWYG <-> HTML i poprawny podgląd dla szablonów z tokenami w atrybutach.
 
+14.
+- Decyzja: W Milestone 2.0 testowa wysyłka korzysta z lokalnego mock route handlera `POST /api/email/test` z opóźnieniem 700 ms, limitem 1/5 s i losowym błędem 10%.
+- Uzasadnienie: ROADMAP 2.0 wymaga domknięcia przepływu wysyłki testowej bez produkcyjnego backendu.
+- Konsekwencje: UX wysyłki i obsługa błędów mogą być weryfikowane end-to-end lokalnie, ale zachowanie jest symulowane.
+
+15.
+- Decyzja: Integracja wysyłki testowej po stronie UI została wydzielona do klienta `email-api.ts` z jawnym kontraktem request/response/error.
+- Uzasadnienie: ROADMAP 2.0 wymaga obsługi sukcesu i błędów API oraz spójnego przepływu modalu „Wyślij test”.
+- Konsekwencje: Warstwa UI pozostaje prostsza, a testy kontraktowe endpointu i klienta API są łatwiejsze do utrzymania.
+
 ---
 
 ## Jakość i kryteria akceptacji
